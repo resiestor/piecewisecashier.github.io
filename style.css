@@ -1,0 +1,63 @@
+body {
+  font-family: monospace;
+  padding: 20px;
+}
+
+input[type="number"] {
+  width: 50px;
+}
+
+pre {
+  background-color: #f8f8f8;
+  padding: 15px;
+  border: 1px solid #ccc;
+  white-space: pre-wrap;
+  margin-top: 20px;
+}
+
+/* Tabel Menu, Harga, dan Diskon */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px; /* Menambahkan jarak di atas tabel */
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+/* Form Input Belanja - Jarak antara tabel dan form */
+#formBelanja {
+  margin-top: 40px; /* Menambahkan jarak antara tabel dan form input */
+}
+
+#formBelanja .form-label {
+  font-weight: bold;
+}
+
+/* Tombol cetak tidak ikut tercetak */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #hasilBon, #hasilBon * {
+    visibility: visible;
+  }
+
+  #hasilBon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}

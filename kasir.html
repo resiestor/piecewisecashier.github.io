@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasir Supermarket Piecewise</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+    }
+
+    input[type="number"] {
+      width: 100px;
+    }
+
+    pre {
+      background-color: #f8f8f8;
+      padding: 15px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+      margin-top: 20px;
+    }
+
+    /* Tabel Menu, Harga, dan Diskon */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    /* Tombol cetak tidak ikut tercetak */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #hasilBon, #hasilBon * {
+        visibility: visible;
+      }
+
+      #hasilBon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container py-5">
+    <h2 class="mb-4 text-center">🛒 Kasir Supermarket Piecewise</h2>
+
+    <!-- Menampilkan Daftar Menu, Harga, dan Diskon -->
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Menu</th>
+            <th>Harga</th>
+            <th>Diskon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Keripik</td>
+            <td>Rp 15.000,00</td>
+            <td>Diskon: Beli 2, Dapat 5.000</td>
+          </tr>
+          <tr>
+            <td>Sabun</td>
+            <td>Rp 20.000,00</td>
+            <td>Tidak Ada Diskon</td>
+          </tr>
+          <tr>
+            <td>Minuman Dingin</td>
+            <td>Rp 5.000,00</td>
+            <td>Tidak Ada Diskon</td>
+          </tr>
+          <tr>
+            <td>Roti</td>
+            <td>Rp 12.000,00</td>
+            <td>Diskon: Beli 3, Dapat 3.000</td>
+          </tr>
+          <tr>
+            <td>Pasta Gigi</td>
+            <td>Rp 8.000,00</td>
+            <td>Tidak Ada Diskon</td>
+          </tr>
+          <tr>
+            <td>Mie Instan</td>
+            <td>Rp 3.000,00</td>
+            <td>Diskon: Beli 5, Dapat 1.000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Form Input Belanja -->
+    <form id="formBelanja" class="row g-3">
+      <div class="col-md-4">
+        <label for="keripik" class="form-label">Keripik</label>
+        <input type="number" id="keripik" min="0" value="0" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label for="sabun" class="form-label">Sabun</label>
+        <input type="number" id="sabun" min="0" value="0" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label for="minuman" class="form-label">Minuman Dingin</label>
+        <input type="number" id="minuman" min="0" value="0" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label for="roti" class="form-label">Roti</label>
+        <input type="number" id="roti" min="0" value="0" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label for="pasta" class="form-label">Pasta Gigi</label>
+        <input type="number" id="pasta" min="0" value="0" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label for="mie" class="form-label">Mie Instan</label>
+        <input type="number" id="mie" min="0" value="0" class="form-control">
+      </div>
+
+      <div class="col-12 d-flex gap-3 mt-3">
+        <button type="button" onclick="hitungBon()" class="btn btn-primary">Hitung Bon</button>
+        <button type="button" onclick="window.print()" class="btn btn-success" id="btnCetak">Cetak / Simpan ke PDF</button>
+      </div>
+    </form>
+
+    <!-- Hasil Bon Belanja -->
+    <div class="mt-5">
+      <pre id="hasilBon" class="border bg-white p-3"></pre>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (optional for interactive components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Daftar harga barang
+    const harga = {
+      keripik: 15000,
+      sabun: 20000,
+      minuman: 5000,
+      roti: 12000,
+      pasta: 8000,
+      mie: 3000
+    };
+
+    // Diskon
+    const diskon = {
+      keripik: { beli: 2, diskonPerPack: 5000 },
+      roti: { beli: 3, diskonPerItem: 3000 },
+      mie: { beli: 5, diskonPerPack: 1000 }
+    };
+
+    function hitungBon() {
+      // Ambil jumlah barang dari input
+      let keripik = parseInt(document.getElementById("keripik").value) || 0;
+      let sabun = parseInt(document.getElementById("sabun").value) || 0;
+      let minuman = parseInt(document.getElementById("minuman").value) || 0;
+      let roti = parseInt(document.getElementById("roti").value) || 0;
+      let pasta = parseInt(document.getElementById("pasta").value) || 0;
+      let mie = parseInt(document.getElementById("mie").value) || 0;
+
+      // Menghitung subtotal dan diskon
+      let bon = '';
+      let totalBayar = 0;
+
+      function hitungSubtotal(barang, jumlah, diskonBarang = {}) {
+        let hargaSatuan = harga[barang];
+        let subtotal = hargaSatuan * jumlah;
+        let diskonValue = 0;
+
+        // Cek apakah ada diskon
+        if (diskonBarang.beli && jumlah >= diskonBarang.beli) {
+          diskonValue = Math.floor(jumlah / diskonBarang.beli) * diskonBarang.diskonPerPack || 0;
+        }
+
+        return {
+          hargaSatuan: hargaSatuan,
+          subtotal: subtotal,
+          diskon: diskonValue,
+          total: subtotal - diskonValue
+        };
+      }
+
+      // Keripik
+      let keripikDetails = hitungSubtotal('keripik', keripik, diskon.keripik);
+      totalBayar += keripikDetails.total;
+      bon += `Keripik         ${keripik}        Rp ${keripikDetails.hargaSatuan.toLocaleString()},00     Rp ${keripikDetails.subtotal.toLocaleString()},00     Rp ${keripikDetails.diskon.toLocaleString()},00 Rp ${keripikDetails.total.toLocaleString()},00\n`;
+
+      // Sabun
+      let sabunDetails = hitungSubtotal('sabun', sabun);
+      totalBayar += sabunDetails.total;
+      bon += `Sabun           ${sabun}        Rp ${sabunDetails.hargaSatuan.toLocaleString()},00     Rp ${sabunDetails.subtotal.toLocaleString()},00     Rp 0,00     Rp ${sabunDetails.total.toLocaleString()},00\n`;
+
+      // Minuman
+      let minumanDetails = hitungSubtotal('minuman', minuman);
+      totalBayar += minumanDetails.total;
+      bon += `Minuman Dingin  ${minuman}       Rp ${minumanDetails.hargaSatuan.toLocaleString()},00     Rp ${minumanDetails.subtotal.toLocaleString()},00     Rp 0,00     Rp ${minumanDetails.total.toLocaleString()},00\n`;
+
+      // Roti
+      let rotiDetails = hitungSubtotal('roti', roti, diskon.roti);
+      totalBayar += rotiDetails.total;
+      bon += `Roti            ${roti}        Rp ${rotiDetails.hargaSatuan.toLocaleString()},00     Rp ${rotiDetails.subtotal.toLocaleString()},00     Rp ${rotiDetails.diskon.toLocaleString()},00 Rp ${rotiDetails.total.toLocaleString()},00\n`;
+
+      // Pasta Gigi
+      let pastaDetails = hitungSubtotal('pasta', pasta);
+      totalBayar += pastaDetails.total;
+      bon += `Pasta Gigi      ${pasta}      Rp ${pastaDetails.hargaSatuan.toLocaleString()},00     Rp ${pastaDetails.subtotal.toLocaleString()},00     Rp 0,00     Rp ${pastaDetails.total.toLocaleString()},00\n`;
+
+      // Mie Instan
+      let mieDetails = hitungSubtotal('mie', mie, diskon.mie);
+      totalBayar += mieDetails.total;
+      bon += `Mie Instan      ${mie}       Rp ${mieDetails.hargaSatuan.toLocaleString()},00     Rp ${mieDetails.subtotal.toLocaleString()},00     Rp ${mieDetails.diskon.toLocaleString()},00 Rp ${mieDetails.total.toLocaleString()},00\n`;
+
+      // Tampilkan hasil
+      let hasil = `
+==================== Bon Belanja ====================
+Supermarket Piecewise
+Tanggal: ${new Date().toLocaleDateString()}
+-------------------------------------------------------------
+Barang          Jumlah   Harga Satuan    Subtotal        Diskon     Total          
+-------------------------------------------------------------
+${bon}
+-------------------------------------------------------------
+Total Bayar                                           Rp ${totalBayar.toLocaleString()},00   
+-------------------------------------------------------------
+Terima Kasih Atas Kunjungan Anda!
+=========================================================
+      `;
+      document.getElementById("hasilBon").textContent = hasil;
+    }
+  </script>
+
+</body>
+</html>
